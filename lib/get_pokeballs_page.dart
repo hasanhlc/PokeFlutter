@@ -46,48 +46,56 @@ class _GetPokeballsPageState extends State<GetPokeballsPage> {
           ),
         ],
       ),
-      body: Center(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            SizedBox(
-              width: 200,
-              height: 200,
-              child: CircularProgressIndicator(
-                value: progress,
-                strokeWidth: 10,
-                backgroundColor: Colors.grey[300],
-                color: Colors.blue,
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/background.jpg'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 200,
+                height: 200,
+                child: CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 10,
+                  backgroundColor: Colors.grey[300],
+                  color: Colors.blue,
+                ),
               ),
-            ),
-            ElevatedButton(
-              onPressed: _incrementCount,
-              style: ElevatedButton.styleFrom(
-                shape: const CircleBorder(),
-                padding: const EdgeInsets.all(40),
-                backgroundColor: Colors.red,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.catching_pokemon,
-                    size: 40,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Get Pokeballs\n${_clickCount}/$_requiredClicks',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
+              ElevatedButton(
+                onPressed: _incrementCount,
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(40),
+                  backgroundColor: Colors.red,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.catching_pokemon,
+                      size: 40,
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text(
+                      'Get Pokeballs\n${_clickCount}/$_requiredClicks',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

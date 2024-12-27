@@ -110,20 +110,85 @@ class _PokemonsPageState extends State<PokemonsPage>
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
-                        if (widget.money >= 1.0) {
+                        if (widget.money >= 2.0) {
+                          final bool catchSuccess = Random().nextBool(); // 50% şans
                           setState(() {
-                            widget.onMoneyChanged(widget.money - 1.0);
-                            widget.onPokemonCaught(response.data);
-                            caughtPokemons.add(response.data);
+                            widget.onMoneyChanged(widget.money - 2.0);
                           });
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  'You caught ${response.data['name'].toString().toUpperCase()}!'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
+                          
+                          if (catchSuccess) {
+                            setState(() {
+                              widget.onPokemonCaught(response.data);
+                              caughtPokemons.add(response.data);
+                            });
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: cardColor,
+                                  title: const Text(
+                                    'Success!',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  content: const Text(
+                                    'Pokemon has been caught!',
+                                    style: TextStyle(color: Colors.white),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  actions: [
+                                    Center(
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Popup'ı kapat
+                                          Navigator.of(context).pop(); // Ana dialog'u kapat
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: Colors.red,
+                                  title: const Text(
+                                    'Failed!',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  content: const Text(
+                                    'Pokemon escaped!',
+                                    style: TextStyle(color: Colors.white),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  actions: [
+                                    Center(
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Sadece popup'ı kapat
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
                         } else {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -134,7 +199,39 @@ class _PokemonsPageState extends State<PokemonsPage>
                           );
                         }
                       },
-                      child: const Text('Catch (1.0)'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                'Catch',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('Cost: '),
+                              const Text(
+                                '2',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(Icons.catching_pokemon, size: 16),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -150,44 +247,52 @@ class _PokemonsPageState extends State<PokemonsPage>
 
   @override
   Widget build(BuildContext context) {
-    return pokemonList.isEmpty
-        ? const Center(child: CircularProgressIndicator())
-        : GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            padding: const EdgeInsets.all(10),
-            itemCount: pokemonList.length,
-            itemBuilder: (context, index) {
-              final pokemon = pokemonList[index];
-              final id = index + 1;
-              final imageUrl =
-                  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png';
-              return GestureDetector(
-                onTap: () => fetchPokemonDetails(pokemon['url'], colors[index]),
-                child: Card(
-                  color: colors[index],
-                  elevation: 4,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.network(
-                        imageUrl,
-                        height: 100,
-                        width: 100,
-                        fit: BoxFit.cover,
-                      ),
-                      Text(
-                        pokemon['name'].toString().toUpperCase(),
-                      ),
-                    ],
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/background.jpg'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: pokemonList.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              padding: const EdgeInsets.all(10),
+              itemCount: pokemonList.length,
+              itemBuilder: (context, index) {
+                final pokemon = pokemonList[index];
+                final id = index + 1;
+                final imageUrl =
+                    'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png';
+                return GestureDetector(
+                  onTap: () => fetchPokemonDetails(pokemon['url'], colors[index]),
+                  child: Card(
+                    color: colors[index],
+                    elevation: 4,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.network(
+                          imageUrl,
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
+                        ),
+                        Text(
+                          pokemon['name'].toString().toUpperCase(),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          );
+                );
+              },
+            ),
+    );
   }
 }
