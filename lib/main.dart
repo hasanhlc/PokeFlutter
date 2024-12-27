@@ -38,6 +38,9 @@ class _HomePageState extends State<HomePage>
   late AnimationController _animationController;
   late Animation<double> _animation;
 
+  double money = 1000.0; // Para değeri
+  List caughtPokemons = []; // Yakalanan pokemonlar listesi
+
   @override
   void initState() {
     super.initState();
@@ -146,33 +149,41 @@ class _HomePageState extends State<HomePage>
                     ),
                     const SizedBox(height: 10),
                     const Divider(thickness: 2, color: Colors.black),
-                    Align(
-                      alignment: Alignment.center,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                          ),
+                          onPressed: () {
+                            _animationController
+                                .reverse()
+                                .then((value) => Navigator.of(context).pop());
+                          },
+                          child: const Text('Kapat'),
                         ),
-                        onPressed: () {
-                          _animationController
-                              .reverse()
-                              .then((value) => Navigator.of(context).pop());
-                        },
-                        child: const Text('Kapat'),
-                      ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                          ),
+                          onPressed: () {
+                            if (money >= 2) {
+                              setState(() {
+                                money -= 2;
+                                caughtPokemons.add(response.data);
+                              });
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          child: const Text('Yakala'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ),
-          );
-        },
-        transitionBuilder: (context, anim1, anim2, child) {
-          return ScaleTransition(
-            scale: Tween<double>(begin: 0.5, end: 1.0).animate(CurvedAnimation(
-              parent: anim1,
-              curve: Curves.easeInOut,
-            )),
-            child: child,
           );
         },
       );
@@ -185,14 +196,26 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Pokemons',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
+        title: const Text('Pokemons'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.attach_money),
+            onPressed: () {},
           ),
+          Text('\$${money.toStringAsFixed(2)}'),
+        ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            ListTile(
+              title: const Text('Ana Sayfa'),
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
         ),
-        centerTitle: true,
       ),
       body: pokemonList.isEmpty
           ? const Center(child: CircularProgressIndicator())
@@ -225,14 +248,8 @@ class _HomePageState extends State<HomePage>
                           width: 100,
                           fit: BoxFit.cover,
                         ),
-                        const SizedBox(height: 10),
-                        const Divider(thickness: 2, color: Colors.black),
                         Text(
                           pokemon['name'].toString().toUpperCase(),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
                         ),
                       ],
                     ),
