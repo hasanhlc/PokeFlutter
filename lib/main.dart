@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'dart:math';
+import 'my_pokemons_page.dart';
+import 'get_pokeballs_page.dart';
+import 'pokemons.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,167 +30,113 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
-  List pokemonList = [];
-  final List<Color> colors = List.generate(100,
-      (index) => Colors.primaries[Random().nextInt(Colors.primaries.length)]);
+class _HomePageState extends State<HomePage> {
+  double money = 6.0;
+  int _currentIndex = 0;
+  List caughtPokemons = [];
+  int _clickCount = 0;
+  static const int _requiredClicks = 30;
 
-  late AnimationController _animationController;
-  late Animation<double> _animation;
-
-  double money = 1000.0; // Para değeri
-  List caughtPokemons = []; // Yakalanan pokemonlar listesi
-
-  @override
-  void initState() {
-    super.initState();
-    fetchPokemonData();
-
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  Future<void> fetchPokemonData() async {
-    var dio = Dio();
-    try {
-      var response =
-          await dio.get('https://pokeapi.co/api/v2/pokemon?limit=100');
-      setState(() {
-        pokemonList = response.data['results'];
-      });
-    } catch (e) {
-      print('Hata: $e');
-    }
-  }
-
-  Future<void> fetchPokemonDetails(String url, Color cardColor) async {
-    var dio = Dio();
-    try {
-      var response = await dio.get(url);
-      _animationController.reset();
-      _animationController.forward();
-      showGeneralDialog(
-        context: context,
-        barrierDismissible: true,
-        barrierLabel:
-            MaterialLocalizations.of(context).modalBarrierDismissLabel,
-        transitionDuration: const Duration(milliseconds: 500),
-        pageBuilder: (context, anim1, anim2) {
-          return ScaleTransition(
-            scale: _animation,
-            child: Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                width: 300,
-                padding: const EdgeInsets.all(16.0),
-                color: cardColor,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Divider(thickness: 2, color: Colors.black),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        response.data['name'].toString().toUpperCase(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                    const Divider(thickness: 2, color: Colors.black),
-                    const SizedBox(height: 10),
-                    Image.network(
-                      response.data['sprites']['front_default'],
-                      height: 150,
-                      fit: BoxFit.contain,
-                    ),
-                    const SizedBox(height: 10),
-                    const Divider(thickness: 2, color: Colors.black),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'Height: ${response.data['height']}',
-                        style:
-                            const TextStyle(fontSize: 18, color: Colors.black),
-                      ),
-                    ),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'Weight: ${response.data['weight']}',
-                        style:
-                            const TextStyle(fontSize: 18, color: Colors.black),
-                      ),
-                    ),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'Base Experience: ${response.data['base_experience']}',
-                        style:
-                            const TextStyle(fontSize: 18, color: Colors.black),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Divider(thickness: 2, color: Colors.black),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                          ),
-                          onPressed: () {
-                            _animationController
-                                .reverse()
-                                .then((value) => Navigator.of(context).pop());
-                          },
-                          child: const Text('Kapat'),
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                          ),
-                          onPressed: () {
-                            if (money >= 2) {
-                              setState(() {
-                                money -= 2;
-                                caughtPokemons.add(response.data);
-                              });
-                              Navigator.of(context).pop();
-                            }
-                          },
-                          child: const Text('Yakala'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+  Widget _buildMyPokemonsPage() {
+    return caughtPokemons.isEmpty
+        ? const Center(
+            child: Text(
+              'You haven\'t caught any Pokemon yet!',
+              style: TextStyle(fontSize: 18),
             ),
+          )
+        : ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: caughtPokemons.length,
+            itemBuilder: (context, index) {
+              final pokemon = caughtPokemons[index];
+              return Card(
+                elevation: 3,
+                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.all(8),
+                  leading: Image.network(
+                    pokemon['sprites']['front_default'],
+                    width: 60,
+                    height: 60,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.error);
+                    },
+                  ),
+                  title: Text(
+                    pokemon['name'].toString().toUpperCase(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Type: ${pokemon['types'][0]['type']['name']}',
+                    style: const TextStyle(
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+              );
+            },
           );
-        },
-      );
-    } catch (e) {
-      print('Hata: $e');
-    }
+  }
+
+  Widget _buildGetPokeballsPage() {
+    double progress = _clickCount / _requiredClicks;
+
+    return Center(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox(
+            width: 200,
+            height: 200,
+            child: CircularProgressIndicator(
+              value: progress,
+              strokeWidth: 10,
+              backgroundColor: Colors.grey[300],
+              color: Colors.blue,
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _clickCount++;
+                if (_clickCount >= _requiredClicks) {
+                  _clickCount = 0;
+                  money += 1;
+                }
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(40),
+              backgroundColor: Colors.red,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.catching_pokemon,
+                  size: 40,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Get Pokeballs\n$_clickCount/$_requiredClicks',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -198,65 +145,76 @@ class _HomePageState extends State<HomePage>
       appBar: AppBar(
         title: const Text('Pokemons'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.attach_money),
-            onPressed: () {},
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.catching_pokemon, color: Colors.red),
+                const SizedBox(width: 5),
+                Text('$money'),
+              ],
+            ),
           ),
-          Text('\$${money.toStringAsFixed(2)}'),
         ],
       ),
       drawer: Drawer(
         child: ListView(
+          padding: EdgeInsets.zero,
           children: [
             ListTile(
-              title: const Text('Ana Sayfa'),
+              leading: const Icon(Icons.home),
+              title: const Text('Pokemons'),
               onTap: () {
-                Navigator.of(context).pop();
+                setState(() {
+                  _currentIndex = 0;
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.catching_pokemon),
+              title: const Text('My Pokemons'),
+              onTap: () {
+                setState(() {
+                  _currentIndex = 1;
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.shopping_cart),
+              title: const Text('Get Pokeballs'),
+              onTap: () {
+                setState(() {
+                  _currentIndex = 2;
+                });
+                Navigator.pop(context);
               },
             ),
           ],
         ),
       ),
-      body: pokemonList.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 1,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-              ),
-              padding: const EdgeInsets.all(10),
-              itemCount: pokemonList.length,
-              itemBuilder: (context, index) {
-                final pokemon = pokemonList[index];
-                final id = index + 1;
-                final imageUrl =
-                    'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png';
-                return GestureDetector(
-                  onTap: () =>
-                      fetchPokemonDetails(pokemon['url'], colors[index]),
-                  child: Card(
-                    color: colors[index],
-                    elevation: 4,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.network(
-                          imageUrl,
-                          height: 100,
-                          width: 100,
-                          fit: BoxFit.cover,
-                        ),
-                        Text(
-                          pokemon['name'].toString().toUpperCase(),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          PokemonsPage(
+            money: money,
+            onMoneyChanged: (newValue) {
+              setState(() {
+                money = newValue;
+              });
+            },
+            onPokemonCaught: (pokemon) {
+              setState(() {
+                caughtPokemons.add(pokemon);
+              });
+            },
+          ),
+          _buildMyPokemonsPage(),
+          _buildGetPokeballsPage(),
+        ],
+      ),
     );
   }
 }
