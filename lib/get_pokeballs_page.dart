@@ -84,7 +84,7 @@ class _GetPokeballsPageState extends State<GetPokeballsPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Get Pokeballs\n${_clickCount}/$_requiredClicks',
+                      'Get Pokeballs\n$_clickCount/$_requiredClicks',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.white,

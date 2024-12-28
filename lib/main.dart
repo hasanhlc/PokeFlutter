@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'my_pokemons_page.dart';
-import 'get_pokeballs_page.dart';
 import 'pokemons.dart';
 
 void main() {
@@ -165,7 +163,13 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pokemons'),
+        title: Center(
+          child: Image.asset(
+            'assets/logo.jpg',
+            height: 40,
+            fit: BoxFit.contain,
+          ),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),

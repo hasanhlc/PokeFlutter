@@ -54,14 +54,103 @@ class _PokemonsPageState extends State<PokemonsPage>
   Future<void> fetchPokemonData() async {
     var dio = Dio();
     try {
-      var response =
-          await dio.get('https://pokeapi.co/api/v2/pokemon?limit=100');
+      var response = await dio.get('https://pokeapi.co/api/v2/pokemon?limit=151');
+      var results = response.data['results'] as List;
+      
+      // Sadece temel seviye Pokemonları filtrele
+      var filteredResults = results.where((pokemon) {
+        // Pokemon ID'sini URL'den çıkar
+        var id = int.parse(pokemon['url'].split('/')[6]);
+        // Sadece 1-151 arası Pokemonları al ve evrimleşmiş formları filtrele
+        return id <= 151 && !_isEvolvedForm(pokemon['name']);
+      }).toList();
+
       setState(() {
-        pokemonList = response.data['results'];
+        pokemonList = filteredResults;
       });
     } catch (e) {
       print('Hata: $e');
     }
+  }
+
+  bool _isEvolvedForm(String name) {
+    // Evrimleşmiş formların listesi
+    final evolvedForms = [
+      // Normal evrimler
+      'charmeleon', 'charizard', 'wartortle', 'blastoise',
+      'metapod', 'butterfree', 'kakuna', 'beedrill',
+      'pidgeotto', 'pidgeot', 'raticate', 'fearow',
+      'arbok', 'raichu', 'sandslash', 'nidorina',
+      'nidoqueen', 'nidorino', 'nidoking', 'clefable',
+      'ninetales', 'wigglytuff', 'golbat', 'gloom',
+      'vileplume', 'parasect', 'venomoth', 'dugtrio',
+      'persian', 'golduck', 'primeape', 'arcanine',
+      'poliwhirl', 'poliwrath', 'kadabra', 'alakazam',
+      'machoke', 'machamp', 'weepinbell', 'victreebel',
+      'tentacruel', 'graveler', 'golem', 'rapidash',
+      'slowbro', 'magneton', 'dodrio', 'dewgong',
+      'muk', 'cloyster', 'haunter', 'gengar',
+      'onix', 'hypno', 'kingler', 'electrode',
+      'exeggcute', 'exeggutor', 'marowak', 'hitmonlee',
+      'hitmonchan', 'weezing', 'rhydon', 'chansey',
+      'tangela', 'kangaskhan', 'seaking', 'starmie',
+      'mr-mime', 'scyther', 'jynx', 'electabuzz',
+      'magmar', 'pinsir', 'tauros', 'gyarados',
+      'lapras', 'ditto', 'vaporeon', 'jolteon',
+      'flareon', 'porygon', 'omastar', 'kabutops',
+      'aerodactyl', 'snorlax', 'dragonair', 'dragonite',
+      'ivysaur', 'venusaur', // Bulbasaur evrimi
+      'charmeleon', 'charizard', // Charmander evrimi
+      'wartortle', 'blastoise', // Squirtle evrimi
+      'metapod', 'butterfree', // Caterpie evrimi
+      'kakuna', 'beedrill', // Weedle evrimi
+      'pidgeotto', 'pidgeot', // Pidgey evrimi
+      'raticate', // Rattata evrimi
+      'spearow', // Fearow evrimi
+      'arbok', // Ekans evrimi
+      'sandslash', // Sandshrew evrimi
+      'nidorina', 'nidoqueen', // Nidoran♀ evrimi
+      'nidorino', 'nidoking', // Nidoran♂ evrimi
+      'clefable', // Clefairy evrimi
+      'ninetales', // Vulpix evrimi
+      'wigglytuff', // Jigglypuff evrimi
+      'golbat', // Zubat evrimi
+      'gloom', 'vileplume', // Oddish evrimi
+      'parasect', // Paras evrimi
+      'venomoth', // Venonat evrimi
+      'dugtrio', // Diglett evrimi
+      'persian', // Meowth evrimi
+      'golduck', // Psyduck evrimi
+      'primeape', // Mankey evrimi
+      'arcanine', // Growlithe evrimi
+      'poliwrath', 'poliwhirl', // Poliwag evrimi
+      'kadabra', 'alakazam', // Abra evrimi
+      'machoke', 'machamp', // Machop evrimi
+      'weepinbell', 'victreebel', // Bellsprout evrimi
+      'tentacruel', // Tentacool evrimi
+      'graveler', 'golem', // Geodude evrimi
+      'rapidash', // Ponyta evrimi
+      'slowbro', // Slowpoke evrimi
+      'magneton', // Magnemite evrimi
+      'farfetchd', // Tek seviyeli
+      'dodrio', // Doduo evrimi
+      'dewgong', // Seel evrimi
+      'muk', // Grimer evrimi
+      'cloyster', // Shellder evrimi
+      'haunter', 'gengar', // Gastly evrimi
+      'hypno', // Drowzee evrimi
+      'kingler', // Krabby evrimi
+      'electrode', // Voltorb evrimi
+      'exeggutor', // Exeggcute evrimi
+      'marowak', // Cubone evrimi
+      'weezing', // Koffing evrimi
+      'rhydon', // Rhyhorn evrimi
+      'seaking', // Goldeen evrimi
+      'starmie', // Staryu evrimi
+      'gyarados', // Magikarp evrimi
+      'dragonair', 'dragonite', // Dratini evrimi
+    ];
+    return evolvedForms.contains(name.toLowerCase());
   }
 
   Future<void> fetchPokemonDetails(String url, Color cardColor) async {
@@ -70,171 +159,200 @@ class _PokemonsPageState extends State<PokemonsPage>
       var response = await dio.get(url);
       _animationController.reset();
       _animationController.forward();
+
+      // Pokemon'un yakalanmış olup olmadığını kontrol et
+      bool isPokemonCaught = caughtPokemons.any((pokemon) => pokemon['name'] == response.data['name']);
+
       showGeneralDialog(
         context: context,
         barrierDismissible: true,
-        barrierLabel:
-            MaterialLocalizations.of(context).modalBarrierDismissLabel,
+        barrierColor: Colors.black54,
+        barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
         transitionDuration: const Duration(milliseconds: 500),
         pageBuilder: (context, anim1, anim2) {
           return ScaleTransition(
             scale: _animation,
-            child: Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                width: 300,
-                padding: const EdgeInsets.all(16.0),
-                color: cardColor,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.network(
-                      response.data['sprites']['front_default'],
-                      height: 100,
-                      width: 100,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      response.data['name'].toString().toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+            child: AlertDialog(
+              backgroundColor: Colors.transparent,
+              contentPadding: EdgeInsets.zero,
+              content: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 250,
+                    height: 400,
+                    decoration: BoxDecoration(
+                      image: const DecorationImage(
+                        image: AssetImage('assets/CardBackground.png'),
+                        fit: BoxFit.fill,
                       ),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Height: ${response.data['height']} | Weight: ${response.data['weight']}',
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (widget.money >= 2.0) {
-                          final bool catchSuccess = Random().nextBool(); // 50% şans
-                          setState(() {
-                            widget.onMoneyChanged(widget.money - 2.0);
-                          });
-                          
-                          if (catchSuccess) {
-                            setState(() {
-                              widget.onPokemonCaught(response.data);
-                              caughtPokemons.add(response.data);
-                            });
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  backgroundColor: cardColor,
-                                  title: const Text(
-                                    'Success!',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 45),
+                        Image.network(
+                          response.data['sprites']['front_default'],
+                          height: 130,
+                          width: 130,
+                        ),
+                        const SizedBox(height: 40),
+                        Text(
+                          response.data['name'].toString().toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        Text(
+                          'Height: ${response.data['height']}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          'Weight: ${response.data['weight']}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: ElevatedButton(
+                            onPressed: isPokemonCaught 
+                              ? null 
+                              : () {
+                                if (widget.money >= 2.0) {
+                                  final bool catchSuccess = Random().nextBool();
+                                  setState(() {
+                                    widget.onMoneyChanged(widget.money - 2.0);
+                                  });
+                                  
+                                  if (catchSuccess) {
+                                    setState(() {
+                                      widget.onPokemonCaught(response.data);
+                                      caughtPokemons.add(response.data);
+                                    });
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          backgroundColor: Colors.green,
+                                          title: const Text(
+                                            'Success!',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          content: const Text(
+                                            'Pokemon has been caught!',
+                                            style: TextStyle(color: Colors.white),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          actions: [
+                                            Center(
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text('OK'),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          backgroundColor: Colors.red.shade700,
+                                          title: const Text(
+                                            'Failed!',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          content: const Text(
+                                            'Pokemon escaped!',
+                                            style: TextStyle(color: Colors.white),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          actions: [
+                                            Center(
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text('OK'),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  }
+                                } else {
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Not enough money!'),
+                                      backgroundColor: Colors.red,
                                     ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  content: const Text(
-                                    'Pokemon has been caught!',
-                                    style: TextStyle(color: Colors.white),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  actions: [
-                                    Center(
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // Popup'ı kapat
-                                          Navigator.of(context).pop(); // Ana dialog'u kapat
-                                        },
-                                        child: const Text('OK'),
-                                      ),
-                                    ),
-                                  ],
-                                );
+                                  );
+                                }
                               },
-                            );
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  backgroundColor: Colors.red,
-                                  title: const Text(
-                                    'Failed!',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  content: const Text(
-                                    'Pokemon escaped!',
-                                    style: TextStyle(color: Colors.white),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  actions: [
-                                    Center(
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // Sadece popup'ı kapat
-                                        },
-                                        child: const Text('OK'),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          }
-                        } else {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Not enough money!'),
-                              backgroundColor: Colors.red,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              disabledBackgroundColor: Colors.grey.shade300,
+                              disabledForegroundColor: Colors.grey.shade600,
                             ),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text(
-                                'Catch',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text('Cost: '),
-                              const Text(
-                                '2',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  isPokemonCaught ? 'Caught' : 'Catch',
+                                  style: const TextStyle(fontSize: 16),
                                 ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.catching_pokemon, size: 16),
-                            ],
+                                const SizedBox(width: 8),
+                                const Icon(Icons.catching_pokemon),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Cost: 2',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );
@@ -267,9 +385,10 @@ class _PokemonsPageState extends State<PokemonsPage>
               itemCount: pokemonList.length,
               itemBuilder: (context, index) {
                 final pokemon = pokemonList[index];
-                final id = index + 1;
+                // Pokemon ID'sini URL'den çıkar
+                final pokemonId = pokemon['url'].toString().split('/')[6];
                 final imageUrl =
-                    'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png';
+                    'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonId.png';
                 return GestureDetector(
                   onTap: () => fetchPokemonDetails(pokemon['url'], colors[index]),
                   child: Card(
