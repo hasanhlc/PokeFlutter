@@ -194,10 +194,10 @@ class _PokemonsPageState extends State<PokemonsPage>
                         const SizedBox(height: 45),
                         Image.network(
                           response.data['sprites']['front_default'],
-                          height: 130,
-                          width: 130,
+                          height: 150,
+                          width: 150,
                         ),
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 28),
                         Text(
                           response.data['name'].toString().toUpperCase(),
                           style: const TextStyle(
@@ -377,7 +377,7 @@ class _PokemonsPageState extends State<PokemonsPage>
           : GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 1,
+                childAspectRatio: 0.615, // Kartın en-boy oranını resme göre ayarladım
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
               ),
@@ -385,26 +385,43 @@ class _PokemonsPageState extends State<PokemonsPage>
               itemCount: pokemonList.length,
               itemBuilder: (context, index) {
                 final pokemon = pokemonList[index];
-                // Pokemon ID'sini URL'den çıkar
                 final pokemonId = pokemon['url'].toString().split('/')[6];
                 final imageUrl =
                     'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonId.png';
                 return GestureDetector(
                   onTap: () => fetchPokemonDetails(pokemon['url'], colors[index]),
-                  child: Card(
-                    color: colors[index],
-                    elevation: 4,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/CardBackgroundMain.png'),
+                        fit: BoxFit.fill,
+                      ),
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.network(
                           imageUrl,
-                          height: 100,
-                          width: 100,
-                          fit: BoxFit.cover,
+                          height: 150,
+                          width: 150,
+                          fit: BoxFit.contain,
                         ),
+                        const SizedBox(height: 10),
                         Text(
                           pokemon['name'].toString().toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 18,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                offset: Offset(1.0, 1.0),
+                                blurRadius: 3.0,
+                                color: Colors.black,
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

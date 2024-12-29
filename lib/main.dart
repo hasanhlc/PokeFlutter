@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Pokemon App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: 'Comfortaa',
       ),
       home: const HomePage(),
     );
