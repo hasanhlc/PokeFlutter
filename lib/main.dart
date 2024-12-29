@@ -14,7 +14,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Pokemon App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+        ),
         fontFamily: 'Comfortaa',
       ),
       home: const HomePage(),
@@ -164,10 +167,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFF55A603),
         title: Center(
           child: Image.asset(
-            'assets/logo.jpg',
-            height: 40,
+            'assets/Newlogo.png',
+            height: 45,
             fit: BoxFit.contain,
           ),
         ),
@@ -177,9 +181,26 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.catching_pokemon, color: Colors.red),
-                const SizedBox(width: 5),
-                Text('$money'),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF2F0EB),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.catching_pokemon, color: Colors.red),
+                      const SizedBox(width: 5),
+                      Text(
+                        money.toString(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
