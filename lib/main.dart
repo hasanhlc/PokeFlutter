@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'pokemons.dart';
 import 'pokemon_detail.dart';
 import 'login_page.dart';
+import 'get_pokeballs_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,8 +39,7 @@ class _HomePageState extends State<HomePage> {
   double money = 6.0;
   int _currentIndex = 0;
   List caughtPokemons = [];
-  int _clickCount = 0;
-  static const int _requiredClicks = 30;
+  bool _rebuildGetPokeballsPage = false;
 
   Widget _buildMyPokemonsPage() {
     return Container(
@@ -67,7 +67,8 @@ class _HomePageState extends State<HomePage> {
                 final pokemon = caughtPokemons[index];
                 return Card(
                   elevation: 3,
-                  margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                   color: const Color(0xFF59463F),
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(8),
@@ -84,7 +85,8 @@ class _HomePageState extends State<HomePage> {
                           width: 60,
                           height: 60,
                           errorBuilder: (context, error, stackTrace) {
-                            return const Icon(Icons.error, color: Color(0xFFFAFAFA));
+                            return const Icon(Icons.error,
+                                color: Color(0xFFFAFAFA));
                           },
                         ),
                       ),
@@ -92,7 +94,9 @@ class _HomePageState extends State<HomePage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => PokemonDetailPage(pokemon: pokemon)),
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                PokemonDetailPage(pokemon: pokemon)),
                       );
                     },
                     title: Text(
@@ -118,67 +122,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildGetPokeballsPage() {
-    double progress = _clickCount / _requiredClicks;
-
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/background.jpg'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Center(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            SizedBox(
-              width: 200,
-              height: 200,
-              child: CircularProgressIndicator(
-                value: progress,
-                strokeWidth: 10,
-                backgroundColor: Colors.grey[300],
-                color: Colors.blue,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _clickCount++;
-                  if (_clickCount >= _requiredClicks) {
-                    _clickCount = 0;
-                    money += 1;
-                  }
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                shape: const CircleBorder(),
-                padding: const EdgeInsets.all(40),
-                backgroundColor: Colors.red,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.catching_pokemon,
-                    size: 40,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Get Pokeballs\n$_clickCount/$_requiredClicks',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    return GetPokeballsPage(
+      money: money,
+      onMoneyChanged: (newValue) {
+        setState(() {
+          money = newValue;
+        });
+      },
     );
   }
 
@@ -236,6 +186,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 setState(() {
                   _currentIndex = 0;
+                  _rebuildGetPokeballsPage = !_rebuildGetPokeballsPage;
                 });
                 Navigator.pop(context);
               },
@@ -246,6 +197,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 setState(() {
                   _currentIndex = 1;
+                  _rebuildGetPokeballsPage = !_rebuildGetPokeballsPage;
                 });
                 Navigator.pop(context);
               },
@@ -280,7 +232,15 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           _buildMyPokemonsPage(),
-          _buildGetPokeballsPage(),
+          GetPokeballsPage(
+            key: ValueKey(_rebuildGetPokeballsPage),
+            money: money,
+            onMoneyChanged: (newValue) {
+              setState(() {
+                money = newValue;
+              });
+            },
+          ),
         ],
       ),
     );

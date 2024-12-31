@@ -63,6 +63,11 @@ flutter:
     - assets/CardBackground.png
     - assets/CardBackgroundMain.png
     - assets/Newlogo.png
+    - assets/pokeball.png
+    - assets/EmptyBucket.png
+    - assets/OneBall.png
+    - assets/TwoBall.png
+    - assets/ThreeBall.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
