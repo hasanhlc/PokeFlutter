@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pokemons.dart';
+import 'pokemon_detail.dart';
 
 void main() {
   runApp(const MyApp());
@@ -66,29 +67,46 @@ class _HomePageState extends State<HomePage> {
                 return Card(
                   elevation: 3,
                   margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                  color: const Color(0xFF59463F),
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(8),
-                    leading: Image.network(
-                      pokemon['sprites']['front_default'],
+                    leading: Container(
                       width: 60,
                       height: 60,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(Icons.error);
-                      },
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF261B15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: ClipOval(
+                        child: Image.network(
+                          pokemon['sprites']['front_default'],
+                          width: 60,
+                          height: 60,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(Icons.error, color: Color(0xFFFAFAFA));
+                          },
+                        ),
+                      ),
                     ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PokemonDetailPage(pokemon: pokemon)),
+                      );
+                    },
                     title: Text(
                       pokemon['name'].toString().toUpperCase(),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: Colors.white,
+                        color: Color(0xFFFAFAFA),
                       ),
                     ),
                     subtitle: Text(
                       'Type: ${pokemon['types'][0]['type']['name']}',
                       style: const TextStyle(
                         fontStyle: FontStyle.italic,
-                        color: Colors.white,
+                        color: Color(0xFFFAFAFA),
                       ),
                     ),
                   ),
@@ -182,7 +200,8 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF2F0EB),
                     borderRadius: BorderRadius.circular(12),

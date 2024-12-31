@@ -170,189 +170,228 @@ class _PokemonsPageState extends State<PokemonsPage>
         barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
         transitionDuration: const Duration(milliseconds: 500),
         pageBuilder: (context, anim1, anim2) {
-          return ScaleTransition(
-            scale: _animation,
-            child: AlertDialog(
-              backgroundColor: Colors.transparent,
-              contentPadding: EdgeInsets.zero,
-              content: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 250,
-                    height: 400,
-                    decoration: BoxDecoration(
-                      image: const DecorationImage(
-                        image: AssetImage('assets/CardBackground.png'),
-                        fit: BoxFit.fill,
+          return Center(
+            child: ScaleTransition(
+              scale: _animation,
+              child: AlertDialog(
+                backgroundColor: Colors.transparent,
+                contentPadding: EdgeInsets.zero,
+                content: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 250,
+                      height: 400,
+                      decoration: BoxDecoration(
+                        image: const DecorationImage(
+                          image: AssetImage('assets/CardBackground.png'),
+                          fit: BoxFit.fill,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(height: 45),
-                        Image.network(
-                          response.data['sprites']['front_default'],
-                          height: 150,
-                          width: 150,
-                        ),
-                        const SizedBox(height: 28),
-                        Text(
-                          response.data['name'].toString().toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: 45),
+                          Image.network(
+                            response.data['sprites']['front_default'],
+                            height: 150,
+                            width: 150,
                           ),
-                        ),
-                        const SizedBox(height: 15),
-                        Text(
-                          'Height: ${response.data['height']}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
+                          const SizedBox(height: 28),
+                          Text(
+                            response.data['name'].toString().toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          'Weight: ${response.data['weight']}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
+                          const SizedBox(height: 15),
+                          Text(
+                            'Height: ${response.data['height']}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        const Spacer(),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: ElevatedButton(
-                            onPressed: isPokemonCaught 
-                              ? null 
-                              : () {
-                                if (widget.money >= 2.0) {
-                                  final bool catchSuccess = Random().nextBool();
-                                  setState(() {
-                                    widget.onMoneyChanged(widget.money - 2.0);
-                                  });
-                                  
-                                  if (catchSuccess) {
+                          const SizedBox(height: 5),
+                          Text(
+                            'Weight: ${response.data['weight']}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const Spacer(),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: ElevatedButton(
+                              onPressed: isPokemonCaught 
+                                ? null 
+                                : () {
+                                  if (widget.money >= 2.0) {
+                                    final bool catchSuccess = Random().nextBool();
                                     setState(() {
-                                      widget.onPokemonCaught(response.data);
-                                      caughtPokemons.add(response.data);
+                                      widget.onMoneyChanged(widget.money - 2.0);
                                     });
-                                    showDialog(
-                                      context: context,
-                                      barrierDismissible: false,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          backgroundColor: Colors.green,
-                                          title: const Text(
-                                            'Success!',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          content: const Text(
-                                            'Pokemon has been caught!',
-                                            style: TextStyle(color: Colors.white),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          actions: [
-                                            Center(
-                                              child: ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text('OK'),
+                                    
+                                    if (catchSuccess) {
+                                      setState(() {
+                                        widget.onPokemonCaught(response.data);
+                                        caughtPokemons.add(response.data);
+                                      });
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return Center(
+                                            child: AlertDialog(
+                                              backgroundColor: Colors.green,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(20),
                                               ),
+                                              title: const Text(
+                                                'Success!',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              content: const Text(
+                                                'Pokemon has been caught!',
+                                                style: TextStyle(color: Colors.white),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              actionsAlignment: MainAxisAlignment.center,
+                                              actions: [
+                                                ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors.white,
+                                                    foregroundColor: Colors.green,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(12),
+                                                    ),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text(
+                                                    'OK',
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        );
-                                      },
-                                    );
+                                          );
+                                        },
+                                      );
+                                    } else {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Center(
+                                            child: AlertDialog(
+                                              backgroundColor: Colors.red.shade700,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                              title: const Text(
+                                                'Failed!',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              content: const Text(
+                                                'Pokemon escaped!',
+                                                style: TextStyle(color: Colors.white),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              actionsAlignment: MainAxisAlignment.center,
+                                              actions: [
+                                                ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors.white,
+                                                    foregroundColor: Colors.red,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(12),
+                                                    ),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text(
+                                                    'OK',
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }
                                   } else {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          backgroundColor: Colors.red.shade700,
-                                          title: const Text(
-                                            'Failed!',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          content: const Text(
-                                            'Pokemon escaped!',
-                                            style: TextStyle(color: Colors.white),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          actions: [
-                                            Center(
-                                              child: ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text('OK'),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Not enough money!'),
+                                        backgroundColor: Colors.red,
+                                      ),
                                     );
                                   }
-                                } else {
-                                  Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Not enough money!'),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.black,
-                              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
+                                },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                disabledBackgroundColor: Colors.grey.shade300,
+                                disabledForegroundColor: Colors.grey.shade600,
                               ),
-                              disabledBackgroundColor: Colors.grey.shade300,
-                              disabledForegroundColor: Colors.grey.shade600,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  isPokemonCaught ? 'Caught' : 'Catch',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                const SizedBox(width: 8),
-                                const Icon(Icons.catching_pokemon),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'Cost: 2',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    isPokemonCaught ? 'Caught' : 'Catch',
+                                    style: const TextStyle(fontSize: 16),
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.catching_pokemon),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'Cost: 2',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
