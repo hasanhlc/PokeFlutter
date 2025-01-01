@@ -11,7 +11,7 @@ class UserService {
   UserService._internal();
 
   final List<User> _users = [
-    User(username: 'hans', password: '1234'), // Varsayılan kullanıcı
+    User(username: 'ash', password: '1234'), // Varsayılan kullanıcı
   ];
 
   bool register(String username, String password) {

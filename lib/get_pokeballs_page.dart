@@ -39,7 +39,7 @@ class _GetPokeballsPageState extends State<GetPokeballsPage> {
     } else if (_collectedBalls == 2) {
       return 'assets/TwoBall.png';
     } else {
-      return 'assets/ThreeBall.png';
+      return 'assets/threeball.png';
     }
   }
 
@@ -98,7 +98,7 @@ class _GetPokeballsPageState extends State<GetPokeballsPage> {
                   GestureDetector(
                     onTap: _incrementCount,
                     child: Image.asset(
-                      'assets/pokeball.png',
+                      'assets/Pokeball.png',
                       width: 120,
                       height: 120,
                     ),

@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/background.jpg'),
+          image: AssetImage('assets/Background.jpg'),
           fit: BoxFit.cover,
         ),
       ),
@@ -139,7 +139,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: const Color(0xFF55A603),
         title: Center(
           child: Image.asset(
-            'assets/Newlogo.png',
+            'assets/NewLogo.png',
             height: 45,
             fit: BoxFit.contain,
           ),
@@ -162,7 +162,7 @@ class _HomePageState extends State<HomePage> {
                       const Icon(Icons.catching_pokemon, color: Colors.red),
                       const SizedBox(width: 5),
                       Text(
-                        money.toString(),
+                        money.toInt().toString(),
                         style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 16,

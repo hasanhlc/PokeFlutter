@@ -407,7 +407,7 @@ class _PokemonsPageState extends State<PokemonsPage>
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/background.jpg'),
+          image: AssetImage('assets/Background.jpg'),
           fit: BoxFit.cover,
         ),
       ),
